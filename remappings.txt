@@ -1,5 +1,15 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 @eth-infinitism/account-abstraction/=lib/account-abstraction/contracts/
-@openzeppelin/=lib/openzeppelin-contracts/
+@openzeppelin/contracts/=lib/modular-account/lib/openzeppelin-contracts/contracts/
+openzeppelin-contracts/=lib/webauthn-sol/lib/openzeppelin-contracts/
+
+@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+
 @alchemy/modular-account/=lib/modular-account/
+
+@exactly/protocol/=lib/protocol/
+solmate/=lib/solmate/
+
+webauthn-sol/=lib/webauthn-sol/src/
+
