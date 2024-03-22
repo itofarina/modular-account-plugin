@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.19;
 
-import {BasePlugin} from "@alchemy/modular-account/src/plugins/BasePlugin.sol";
-import {IPluginExecutor} from "@alchemy/modular-account/src/interfaces/IPluginExecutor.sol";
+import {BasePlugin} from "@alchemy/modular-account/plugins/BasePlugin.sol";
+import {IPluginExecutor} from "@alchemy/modular-account/interfaces/IPluginExecutor.sol";
 import {
     ManifestFunction,
     ManifestAssociatedFunctionType,
     ManifestAssociatedFunction,
     PluginManifest,
     PluginMetadata
-} from "@alchemy/modular-account/src/interfaces/IPlugin.sol";
-import {IMultiOwnerPlugin} from "@alchemy/modular-account/src/plugins/owner/IMultiOwnerPlugin.sol";
+} from "@alchemy/modular-account/interfaces/IPlugin.sol";
+import {IMultiOwnerPlugin} from "@alchemy/modular-account/plugins/owner/IMultiOwnerPlugin.sol";
 
 /// @title Counter Plugin
 /// @author Alchemy

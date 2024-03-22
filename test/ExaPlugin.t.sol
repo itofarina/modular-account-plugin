@@ -5,15 +5,14 @@ import { Test } from "forge-std/Test.sol";
 import { EntryPoint } from "@eth-infinitism/account-abstraction/core/EntryPoint.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import { UpgradeableModularAccount } from "@alchemy/modular-account/src/account/UpgradeableModularAccount.sol";
-import { IEntryPoint } from "@alchemy/modular-account/src/interfaces/erc4337/IEntryPoint.sol";
-import { UserOperation } from "@alchemy/modular-account/src/interfaces/erc4337/UserOperation.sol";
-import { MultiOwnerModularAccountFactory } from
-  "@alchemy/modular-account/src/factory/MultiOwnerModularAccountFactory.sol";
-import { MultiOwnerPlugin } from "@alchemy/modular-account/src/plugins/owner/MultiOwnerPlugin.sol";
-import { IMultiOwnerPlugin } from "@alchemy/modular-account/src/plugins/owner/IMultiOwnerPlugin.sol";
-import { FunctionReference } from "@alchemy/modular-account/src/interfaces/IPluginManager.sol";
-import { FunctionReferenceLib } from "@alchemy/modular-account/src/helpers/FunctionReferenceLib.sol";
+import { UpgradeableModularAccount } from "@alchemy/modular-account/account/UpgradeableModularAccount.sol";
+import { IEntryPoint } from "@alchemy/modular-account/interfaces/erc4337/IEntryPoint.sol";
+import { UserOperation } from "@alchemy/modular-account/interfaces/erc4337/UserOperation.sol";
+import { MultiOwnerModularAccountFactory } from "@alchemy/modular-account/factory/MultiOwnerModularAccountFactory.sol";
+import { MultiOwnerPlugin } from "@alchemy/modular-account/plugins/owner/MultiOwnerPlugin.sol";
+import { IMultiOwnerPlugin } from "@alchemy/modular-account/plugins/owner/IMultiOwnerPlugin.sol";
+import { FunctionReference } from "@alchemy/modular-account/interfaces/IPluginManager.sol";
+import { FunctionReferenceLib } from "@alchemy/modular-account/helpers/FunctionReferenceLib.sol";
 
 import { ExaPlugin, Auditor, Market } from "../src/ExaPlugin.sol";
 import { InterestRateModel } from "@exactly/protocol/contracts/InterestRateModel.sol";
@@ -92,13 +91,9 @@ contract AccountTest is Test {
     // create our account plugin and grab the manifest hash so we can install it
     // note: plugins are singleton contracts, so we only need to deploy them once
     exaPlugin = new ExaPlugin(auditor);
-    bytes32 manifestHash = keccak256(abi.encode(exaPlugin.pluginManifest()));
+    exaPlugin.grantRole(exaPlugin.KEEPER_ROLE(), keeper1);
 
-    // we will have a single function dependency for our account contract: the multi owner user op validation
-    // we'll use this to ensure that only an owner can sign a user operation that can successfully enter market
-    FunctionReference[] memory dependencies = new FunctionReference[](1);
-    dependencies[0] =
-      FunctionReferenceLib.pack(address(multiOwnerPlugin), uint8(IMultiOwnerPlugin.FunctionId.USER_OP_VALIDATION_OWNER));
+    bytes32 manifestHash = keccak256(abi.encode(exaPlugin.pluginManifest()));
 
     // install this plugin on the account as the owner
     vm.prank(owner1);
@@ -106,7 +101,7 @@ contract AccountTest is Test {
       plugin: address(exaPlugin),
       manifestHash: manifestHash,
       pluginInstallData: "0x",
-      dependencies: dependencies
+      dependencies: new FunctionReference[](0)
     });
 
     asset.mint(address(account1), 1_000_000e18);
@@ -150,7 +145,7 @@ contract AccountTest is Test {
     emit log_named_uint("marketsIndexes", marketsIndexes);
   }
 
-  function signOp(UserOperation memory userOp, uint256 key) internal returns (UserOperation memory) {
+  function signOp(UserOperation memory userOp, uint256 key) internal view returns (UserOperation memory) {
     bytes32 userOpHash = entryPoint.getUserOpHash(userOp);
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(key, userOpHash.toEthSignedMessageHash());
     userOp.signature = abi.encodePacked(r, s, v);
@@ -158,8 +153,7 @@ contract AccountTest is Test {
   }
 
   function test_Deposit() external {
-    vm.prank(owner1);
-    // vm.prank(keeper1);
+    vm.prank(keeper1);
     account1.execute(address(asset), 0, abi.encodeCall(ERC20.approve, (address(exaPlugin), type(uint256).max)));
 
     uint256 amount = 100 ether;

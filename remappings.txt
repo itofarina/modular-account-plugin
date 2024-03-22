@@ -6,7 +6,7 @@ openzeppelin-contracts/=lib/webauthn-sol/lib/openzeppelin-contracts/
 
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
 
-@alchemy/modular-account/=lib/modular-account/
+@alchemy/modular-account/=lib/modular-account/src/
 
 @exactly/protocol/=lib/protocol/
 solmate/=lib/solmate/
